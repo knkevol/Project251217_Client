@@ -2,10 +2,25 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include <iostream>
-#include <WinSock2.h>
 #include <string>
+#include <random>
+#include <WinSock2.h>
 
 #pragma comment(lib, "ws2_32")
+
+#pragma pack(push, 1)
+struct Data
+{
+	int Number1;
+	int Number2;
+	char Operator;
+};
+
+struct Result
+{
+	int Number1;
+};
+#pragma pack(pop)
 
 int main()
 {
@@ -13,64 +28,47 @@ int main()
 
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-	//IP v4, Steram 타입의 소켓 만들어 주셈, TCP
-	//문지기
-	SOCKET ServerSocket = socket(AF_INET, SOCK_STREAM, 0);
+	srand((unsigned int)time(nullptr));
 
-	SOCKADDR_IN ServerSockAddr;
-	memset(&ServerSockAddr, 0, sizeof(ServerSockAddr));
-	//ZeroMemory(&ServerSockAddr, sizeof(ServerSockAddr));
-	ServerSockAddr.sin_family = PF_INET;
-	ServerSockAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); //수업용
-	ServerSockAddr.sin_port = htons(777); //Byte Order
 
-	connect(ServerSocket, (SOCKADDR*)&ServerSockAddr, sizeof(ServerSockAddr));
-
-	char Buffer[1024] = { 0, };
-
-	while(true)
+	while (true)
 	{
-		//네트워크에서 바로 받는다.X OS님의 수신 버퍼에서 꺼내온다.
-		int RecvByte = recv(ServerSocket, Buffer, sizeof(Buffer), 0);
-		std::cout << Buffer << std::endl;
+		//IP v4, Steram 타입의 소켓 만들어 주셈, TCP
+		//문지기
+		SOCKET ServerSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-		char Message[10];
-		char Message2[10];
-		char calc;
-		std::cin >> Message;
-		std::cin >> calc;
-		std::cin >> Message2;
+		SOCKADDR_IN ServerSockAddr;
+		memset(&ServerSockAddr, 0, sizeof(ServerSockAddr));
+		//ZeroMemory(&ServerSockAddr, sizeof(ServerSockAddr));
+		ServerSockAddr.sin_family = PF_INET;
+		ServerSockAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); //수업용
+		ServerSockAddr.sin_port = htons(777); //Byte Order
+		connect(ServerSocket, (SOCKADDR*)&ServerSockAddr, sizeof(ServerSockAddr));
 
-		int sum = 0;
-		switch (calc)
-		{
-		case '+':
-			sum = atoi(Message) + atoi(Message2);
-			break;
-		case '-':
-			sum = atoi(Message) - atoi(Message2);
-			break;
-		case '*':
-			sum = atoi(Message) * atoi(Message2);
-			break;
-		case '/':
-			sum = atoi(Message) / atoi(Message2);
-			break;
+		Data MyPacket;
 
-		}
+		MyPacket.Number1 = rand() % 9999999 + 1;
+		MyPacket.Number2 = rand() % 9999999 + 1;
+		MyPacket.Operator = '+';
 
-		std::string sumMessage = std::to_string(sum);
+		std::cout << MyPacket.Number1 << " ";
+		std::cout << MyPacket.Operator << " ";
+		std::cout << MyPacket.Number2 << " = ";
 
-		//네트워크로 보낸다X. OS님의 송신 버퍼로 보낸다.
-		int SentByte = send(ServerSocket, sumMessage.c_str(), (int)strlen(Message), 0);
+
+		int SentByte = send(ServerSocket, (char*)&MyPacket, sizeof(Data), 0);
+
+		Result MyResult;
+
+		int RecvByte = recv(ServerSocket, (char*)&MyResult, sizeof(MyResult), 0);
+
+		std::cout << MyResult.Number1 << std::endl;
 
 
 		closesocket(ServerSocket);
 	}
-	
 
 	WSACleanup();
 
 	return 0;
 }
-
