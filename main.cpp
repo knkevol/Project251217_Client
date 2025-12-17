@@ -36,13 +36,13 @@ int main()
 
 		char Message[10];
 		char Message2[10];
-		char temp;
+		char calc;
 		std::cin >> Message;
-		std::cin >> temp;
+		std::cin >> calc;
 		std::cin >> Message2;
 
 		int sum = 0;
-		switch (temp)
+		switch (calc)
 		{
 		case '+':
 			sum = atoi(Message) + atoi(Message2);
@@ -59,10 +59,10 @@ int main()
 
 		}
 
-		std::string sum2 = std::to_string(sum);
+		std::string sumMessage = std::to_string(sum);
 
 		//네트워크로 보낸다X. OS님의 송신 버퍼로 보낸다.
-		int SentByte = send(ServerSocket, sum2.c_str(), (int)strlen(Message), 0);
+		int SentByte = send(ServerSocket, sumMessage.c_str(), (int)strlen(Message), 0);
 
 
 		closesocket(ServerSocket);
