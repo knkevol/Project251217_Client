@@ -31,13 +31,13 @@ int main()
 
     for (int i = 0; i < NetFileCount; i++) {
         //크기
-        int netFileSize = 0;
-        RecvByte = recv(ServerSocket, (char*)&netFileSize, sizeof(netFileSize), MSG_WAITALL);
+        int NetFileSize = 0;
+        RecvByte = recv(ServerSocket, (char*)&NetFileSize, sizeof(NetFileSize), MSG_WAITALL);
         if (RecvByte <= 0)
         {
             break;
         }
-        int RecvFileSize = ntohl(netFileSize);
+        int RecvFileSize = ntohl(NetFileSize);
 
         //내용
         char* Buffer = new char[RecvFileSize];
