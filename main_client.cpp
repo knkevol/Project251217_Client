@@ -24,36 +24,40 @@ int main()
 
 	connect(ServerSocket, (SOCKADDR*)&ServerSockAddr, sizeof(ServerSockAddr));
 
-	
+    //갯수
+    int netFileCount = 0;
+    int RecvByte = recv(ServerSocket, (char*)&netFileCount, sizeof(netFileCount), MSG_WAITALL);
+    int fileCount = ntohl(netFileCount);
 
-	int FileSize = 0;
+    for (int i = 0; i < fileCount; i++) {
+        //크기
+        int netFileSize = 0;
+        RecvByte = recv(ServerSocket, (char*)&netFileSize, sizeof(netFileSize), MSG_WAITALL);
+        if (RecvByte <= 0)
+        {
+            break;
+        }
+        int RecvFileSize = ntohl(netFileSize);
 
-	int RecvBytes = recv(ServerSocket, (char*)&FileSize, sizeof(FileSize), MSG_WAITALL);
-	FileSize = ntohl(FileSize); //순서뒤집어서 사용
-	if (RecvBytes <= 0)
-	{
-		//break;
-	}
+        //내용
+        char* Buffer = new char[RecvFileSize];
+        RecvByte = recv(ServerSocket, Buffer, RecvFileSize, MSG_WAITALL);
 
-	FILE* OutputFile = fopen("tree.jpg", "wb");
+        if (RecvByte == RecvFileSize) {
+            char FileName[100];
+            sprintf(FileName, "image_%d.jpg", i);
+            FILE* ImageFile = fopen(FileName, "wb");
+            if (ImageFile)
+            {
+                fwrite(Buffer, sizeof(char), RecvFileSize, ImageFile);
+                fclose(ImageFile);
+            }
+        }
+        delete[] Buffer;
+    }
 
+    closesocket(ServerSocket);
+    WSACleanup();
 
-	char* Buffer = new char[FileSize];
-	RecvBytes = recv(ServerSocket, Buffer, FileSize, MSG_WAITALL);
-	if (!RecvBytes)
-	{
-		//break;
-	}
-	int WriteSize = fwrite(Buffer, sizeof(char), RecvBytes, OutputFile);
-
-	
-
-	fclose(OutputFile);
-
-	closesocket(ServerSocket);
-
-
-	WSACleanup();
-
-	return 0;
+    return 0;
 }
