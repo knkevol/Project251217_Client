@@ -24,17 +24,29 @@ int main()
 
 	connect(ServerSocket, (SOCKADDR*)&ServerSockAddr, sizeof(ServerSockAddr));
 
-	char Buffer[1000000] = { 0, };
+	
 
-	int RecvBytes = recv(ServerSocket, Buffer, sizeof(Buffer), 0);
+	int FileSize = 0;
+
+	int RecvBytes = recv(ServerSocket, (char*)&FileSize, sizeof(FileSize), MSG_WAITALL);
+	FileSize = ntohl(FileSize); //순서뒤집어서 사용
 	if (RecvBytes <= 0)
 	{
 		//break;
 	}
 
-	//파일 쓰기
 	FILE* OutputFile = fopen("tree.jpg", "wb");
+
+
+	char* Buffer = new char[FileSize];
+	RecvBytes = recv(ServerSocket, Buffer, FileSize, MSG_WAITALL);
+	if (!RecvBytes)
+	{
+		//break;
+	}
 	int WriteSize = fwrite(Buffer, sizeof(char), RecvBytes, OutputFile);
+
+	
 
 	fclose(OutputFile);
 
