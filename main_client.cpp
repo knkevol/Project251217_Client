@@ -25,11 +25,11 @@ int main()
 	connect(ServerSocket, (SOCKADDR*)&ServerSockAddr, sizeof(ServerSockAddr));
 
     //°¹¼ö
-    int netFileCount = 0;
-    int RecvByte = recv(ServerSocket, (char*)&netFileCount, sizeof(netFileCount), MSG_WAITALL);
-    int fileCount = ntohl(netFileCount);
+    int FileCount = 0;
+    int RecvByte = recv(ServerSocket, (char*)&FileCount, sizeof(FileCount), MSG_WAITALL);
+    int NetFileCount = ntohl(FileCount);
 
-    for (int i = 0; i < fileCount; i++) {
+    for (int i = 0; i < NetFileCount; i++) {
         //Å©±â
         int netFileSize = 0;
         RecvByte = recv(ServerSocket, (char*)&netFileSize, sizeof(netFileSize), MSG_WAITALL);
