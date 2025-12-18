@@ -26,13 +26,13 @@ int main()
 
     //°¹¼ö
     int FileCount = 0;
-    int RecvByte = recv(ServerSocket, (char*)&FileCount, sizeof(FileCount), MSG_WAITALL);
+    int RecvByte = recv(ServerSocket, (char*)&FileCount, sizeof(FileCount), 0);
     int NetFileCount = ntohl(FileCount);
 
     for (int i = 0; i < NetFileCount; i++) {
         //Å©±â
         int NetFileSize = 0;
-        RecvByte = recv(ServerSocket, (char*)&NetFileSize, sizeof(NetFileSize), MSG_WAITALL);
+        RecvByte = recv(ServerSocket, (char*)&NetFileSize, sizeof(NetFileSize), 0);
         if (RecvByte <= 0)
         {
             break;
